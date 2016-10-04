@@ -1,0 +1,5 @@
+Project
+We need a document tab where the user’s information is stored and can be called on like a separate text file.  Like link a variable to the name using the username.  
+Like
+Var ScubaSteve be the username 
+And when that user name is entered it goes to the text file and brings up the information needed on that said person all saved to a separate file that can be updated and re-saved each time
