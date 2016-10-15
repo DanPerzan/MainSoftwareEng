@@ -1,0 +1,23 @@
+def sum_sq(value):
+    count = value + 1
+    while count > 0:
+        sum_sq = []
+        for x in range(count):
+            sum_sq.append(x**2)
+            count = count - 1
+        sum_sq = sum(p)
+
+    count1 = value + 1
+    while count1 > 0:
+        sq_sum = []
+        for i in range(count1):
+            sq_sum.append(i)
+            count1 = count1 - 1
+        sq_sum = sum(sq_sum)**2
+    return sq_sum - sum_sq
+
+
+>>> sum_sq(10)
+2640
+>>> sum_sq(100)
+25502115
