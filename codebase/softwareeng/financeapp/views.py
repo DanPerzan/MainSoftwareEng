@@ -6,7 +6,8 @@ from django.contrib.auth.decorators import login_required
 
 @login_required
 def index(request):
-    return render(request, 'financeapp/index.html')
+    pw = request.user.password
+    return render(request, 'financeapp/index.html', {'pw': pw})
 
 def loginview(request):
     return render(request, 'financeapp/login.html', {'next': request.GET['next']})
