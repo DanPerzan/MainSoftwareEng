@@ -2,6 +2,15 @@ import datetime
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
+
+#Fix this later to get account dynamically
+def get_null_account():
+    #User = get_user_model()
+    #null_user = User.objects.get(username='null_user')
+    #null_account = Account.objects.get(user=null_user)
+    #return null_account.pk
+    return 3
 
 class Account(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -13,10 +22,10 @@ class Account(models.Model):
     account_type = models.CharField(max_length=1, choices=ACCOUNT_TYPES)
 
 class StudentAccount(models.Model):
-    account = models.OneToOneField(Account, on_delete=models.CASCADE)
+    account = models.OneToOneField(Account, on_delete=models.CASCADE, default=get_null_account())
     funds = models.DecimalField(max_digits=6, decimal_places=2)
     def __str__(self):
-        return self.full_name
+        return self.account.full_name
     def deposit(self, amount):
         self.funds += amount
         super(StudentAccount, self).save(*args, **kwargs)
