@@ -28,5 +28,12 @@ class StudentAccount(models.Model):
         return self.account.full_name
     def deposit(self, amount):
         self.funds += amount
-        super(StudentAccount, self).save(*args, **kwargs)
-        return true
+        super(StudentAccount, self).save()
+        return True
+
+class ParentAccount(models.Model):
+    account = models.OneToOneField(Account, on_delete=models.CASCADE, default=get_null_account())
+    student_accounts = models.ManyToManyField(StudentAccount)
+    
+    def __str__(self):
+        return self.account.full_name

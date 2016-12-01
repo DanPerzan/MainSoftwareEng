@@ -1,27 +1,47 @@
+import decimal
+from financeapp.accountgetter import AccountGetter
 from django.shortcuts import render
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponseForbidden
 from django.urls import reverse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from financeapp.models import Account, StudentAccount
 
 @login_required
-def index(request):
-    user = request.user
-    account = Account.objects.get(user=user)
-    context = {'full_name': account.full_name}
-    return render(request, 'financeapp/index.html', context)
+def student(request, student_id):
+    account_getter = AccountGetter(request.user)
+    student_account = account_getter.student_account
+    if student_account.get_pk() != int(student_id):
+        return HttpResponseForbidden()
+    context = {'full_name': account_getter.account.full_name}
+    return render(request, 'financeapp/student.html', context)
 
 @login_required
-def checkbalanceview(request):
-    user = request.user
-    account = Account.objects.get(user=user)
-    student_account = StudentAccount.objects.get(account=account)
-    context = {'funds': student_account.funds}
+def checkbalanceview(request, student_id):
+    student_account = AccountGetter(request.user).student_account
+    context = {'funds': student_account.get_funds()}
     return render(request, 'financeapp/check_balance.html', context)
 
+@login_required
+def addmoneyview(request, student_id):
+    student_account = AccountGetter(request.user).student_account
+    context = {'funds': student_account.get_funds(), 'student_id': student_id}
+    return render(request, 'financeapp/add_money.html', context)
+
+@login_required
+def doaddmoney(request, student_id):
+    account_getter = AccountGetter(request.user)
+    student_account = account_getter.student_account
+    amount = decimal.Decimal(request.POST["amount"])
+    student_account.deposit(amount)
+    kwargs = {'student_id': student_id}
+    return HttpResponseRedirect(reverse("financeapp:add_money", kwargs=kwargs))
+
 def loginview(request):
-    return render(request, 'financeapp/login.html', {'next': request.GET['next']})
+    if 'next' in request.GET:
+        return render(request, 'financeapp/login.html', {'next': request.GET['next']})
+    else:
+        return render(request, 'financeapp/login.html')
 
 def logoutview(request):
     logout(request)
@@ -37,8 +57,12 @@ def logincheck(request):
         })
     else:
         login(request, user)
-        next_page = request.POST['next']
-        if next_page:
-            return HttpResponseRedirect(next_page)
+        account_getter = AccountGetter(user)
+        student_account = account_getter.student_account
+        student_id = student_account.get_pk()
+        if 'next' in request.POST and request.POST['next'] != "":
+            return HttpResponseRedirect(request.POST['next'])
         else:
-            return HttpResponseRedirect(reverse("financeapp:index"))
+            kwargs = {'student_id': student_id}
+            return HttpResponseRedirect(reverse("financeapp:student", kwargs=kwargs))
+        
