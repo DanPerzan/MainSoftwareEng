@@ -1,0 +1,6 @@
+<p>Balance remaining: ${{ funds }}</p>
+<form action="{% url 'financeapp:doaddmoney' student_id %}" method="POST">
+{% csrf_token %}
+    <input type="number" name="amount" min="0">
+    <input type="submit" value="Add amount">
+</form>

@@ -1,0 +1,7 @@
+<p>Hello, {{ full_name }}</p>
+<h4>Your children:</h4>
+<ul>
+{% for child in children %}
+    <li><a href="{% url 'financeapp:student' child.pk %}">{{ child.full_name }}</a></li>
+{% endfor %}
+</ul>
