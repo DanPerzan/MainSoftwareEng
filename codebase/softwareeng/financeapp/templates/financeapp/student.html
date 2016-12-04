@@ -1,4 +1,7 @@
 <p>Hello, {{ full_name }}</p>
+{% if student_name %}
+    <p>Student: {{ student_name }}</p>
+{% endif %}
 <ul>
     <li><a href="{% url 'financeapp:check_balance' student_id %}">Check Balance</a></li>
     <li><a href="{% url 'financeapp:add_money' student_id %}">Add Money</a></li>

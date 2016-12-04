@@ -14,7 +14,15 @@ def student(request, student_id):
     account_getter = AccountGetter(request.user)
     if not PermissionChecker.check_permissions(account_getter, student_id):
         return HttpResponseForbidden()
-    context = {'full_name': account_getter.account.full_name, 'student_id': student_id}
+    if account_getter.parent_account:
+        student_full_name = account_getter.parent_account.get_child(student_id).get_full_name()
+    else:
+        student_full_name = False
+    context = {
+        'full_name': account_getter.account.full_name,
+        'student_id': student_id,
+        'student_name': student_full_name
+    }
     return render(request, 'financeapp/student.html', context)
 
 @login_required
