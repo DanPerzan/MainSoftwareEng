@@ -1,7 +1,7 @@
 <p>Hello, {{ full_name }}</p>
 <ul>
-    <li><a href="check_balance">Check Balance</a></li>
-    <li><a href="add_money">Add Money</a></li>
-    <li><a href="logout">Exit</a></li>
+    <li><a href="{% url 'financeapp:check_balance' student_id %}">Check Balance</a></li>
+    <li><a href="{% url 'financeapp:add_money' student_id %}">Add Money</a></li>
+    <li><a href="{% url 'financeapp:logout' %}">Exit</a></li>
     <li><a href="{% url 'financeapp:reset' %}">Forgot password</a></li>
 </ul>
