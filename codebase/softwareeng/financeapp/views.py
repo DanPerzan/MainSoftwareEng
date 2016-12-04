@@ -48,14 +48,25 @@ def checkbalanceview(request, student_id):
 
 @login_required
 def addmoneyview(request, student_id):
-    student_account = AccountGetter(request.user).student_account
+    account_getter = AccountGetter(request.user)
+    if not PermissionChecker.check_permissions(account_getter, student_id):
+        return HttpResponseForbidden()
+    if account_getter.student_account:
+        student_account = account_getter.student_account
+    else:
+        student_account = account_getter.parent_account.get_child(student_id)
     context = {'funds': student_account.get_funds(), 'student_id': student_id}
     return render(request, 'financeapp/add_money.html', context)
 
 @login_required
 def doaddmoney(request, student_id):
     account_getter = AccountGetter(request.user)
-    student_account = account_getter.student_account
+    if not PermissionChecker.check_permissions(account_getter, student_id):
+        return HttpResponseForbidden()
+    if account_getter.student_account:
+        student_account = account_getter.student_account
+    else:
+        student_account = account_getter.parent_account.get_child(student_id)
     amount = decimal.Decimal(request.POST["amount"])
     student_account.deposit(amount)
     kwargs = {'student_id': student_id}
