@@ -52,7 +52,8 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'softwareeng.urls'
 
-LOGIN_URL = 'login/'
+LOGIN_URL = '/financeapp/login/'
+LOGIN_REDIRECT_URL = '/financeapp/loginredir/'
 
 TEMPLATES = [
     {
@@ -121,3 +122,12 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 
 STATIC_URL = '/static/'
+
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'sacredheart1225@gmail.com'
+EMAIL_HOST_PASSWORD = 'Jesus1225'
+
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+SERVER_EMAIL = EMAIL_HOST_USER

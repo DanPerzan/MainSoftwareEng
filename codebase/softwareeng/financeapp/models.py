@@ -20,8 +20,6 @@ class Account(models.Model):
         ('S', 'Student')
     )
     account_type = models.CharField(max_length=1, choices=ACCOUNT_TYPES)
-    def change_password(self, new_password):
-        return self.user.set_password(new_password)
 
 class StudentAccount(models.Model):
     account = models.OneToOneField(Account, on_delete=models.CASCADE, default=get_null_account())

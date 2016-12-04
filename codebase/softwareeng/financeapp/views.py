@@ -4,6 +4,7 @@ from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseForbidden
 from django.urls import reverse
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.views import password_reset, password_reset_confirm
 from django.contrib.auth.decorators import login_required
 from financeapp.models import Account, StudentAccount
 from financeapp.permissionchecker import PermissionChecker
@@ -60,36 +61,29 @@ def doaddmoney(request, student_id):
     kwargs = {'student_id': student_id}
     return HttpResponseRedirect(reverse("financeapp:add_money", kwargs=kwargs))
 
-def loginview(request):
-    if 'next' in request.GET:
-        return render(request, 'financeapp/login.html', {'next': request.GET['next']})
-    else:
-        return render(request, 'financeapp/login.html')
+@login_required
+def loginredir(request):
+    account_getter = AccountGetter(request.user)
 
-def logoutview(request):
-    logout(request)
-    return HttpResponseRedirect(reverse("financeapp:login"))
-
-def logincheck(request):
-    username = request.POST['username']
-    password = request.POST['password']
-    user = authenticate(username=username, password=password)
-    if user is None:
-        return render(request, 'financeapp/login.html', {
-            'error_message': "Username or password is incorrect"
-        })
-    else:
-        login(request, user)
-        account_getter = AccountGetter(user)
-        if account_getter.student_account:
-            student_account = account_getter.student_account
-            student_id = student_account.get_pk()
-            if 'next' in request.POST and request.POST['next'] != "":
-                return HttpResponseRedirect(request.POST['next'])
-            else:
-                kwargs = {'student_id': student_id}
-                return HttpResponseRedirect(reverse("financeapp:student", kwargs=kwargs))
+    if account_getter.student_account:
+        student_account = account_getter.student_account
+        student_id = student_account.get_pk()
+        if 'next' in request.POST and request.POST['next'] != "":
+            return HttpResponseRedirect(request.POST['next'])
         else:
-            return HttpResponseRedirect(reverse("financeapp:parenthome"))
+            kwargs = {'student_id': student_id}
+            return HttpResponseRedirect(reverse("financeapp:student", kwargs=kwargs))
+    else:
+        return HttpResponseRedirect(reverse("financeapp:parenthome"))
 
-        
+# Password reset views
+def reset_confirm(request, uidb64=None, token=None):
+    return password_reset_confirm(request, template_name='registration/password_reset_confirm.html',
+        uidb64=uidb64, token=token, post_reset_redirect=reverse('financeapp:login'))
+
+
+def reset(request):
+    return password_reset(request, template_name='registration/password_reset.html',
+        email_template_name='registration/password_reset_email.html',
+        subject_template_name='registration/password_reset_subject.txt',
+        post_reset_redirect=reverse('financeapp:login'))
